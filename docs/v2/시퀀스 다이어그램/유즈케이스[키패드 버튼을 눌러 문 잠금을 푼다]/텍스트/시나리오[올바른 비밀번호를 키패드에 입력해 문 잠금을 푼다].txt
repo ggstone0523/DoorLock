@@ -1,0 +1,20 @@
+frame 유즈케이스: 키패드 버튼을 눌러 문 잠금을 푼다
+title 시나리오: 올바른 비밀번호를 키패드에 입력해 문 잠금을 푼다
+
+actor "User" as user
+participant "TouchGFX[Screen1View]" as TouchGFX(Screen1View)
+participant "numberkey" as numberkey
+participant "sound" as sound
+participant "motor" as motor
+
+loop 시용자가 누른 숫자키 != *
+user->TouchGFX(Screen1View):숫자키를 누른다
+TouchGFX(Screen1View)->numberkey:NumberKeyMessageBuffer[MQ](char)
+numberkey->sound:SoundEventGroup[Event](SOUND_CLICK_NUMBER_KEY)
+end
+
+user->TouchGFX(Screen1View):* 키를 누른다
+TouchGFX(Screen1View)->numberkey:NumberKeyMessageBuffer[MQ](char)
+numberkey->sound:SoundEventGroup[Event](SOUND_CLICK_NUMBER_KEY)
+numberkey->motor:MotorEventGroup[Event](MOTOR_CONTROL)
+numberkey->sound:SoundEventGroup[Event](SOUND_SUCCESS)
