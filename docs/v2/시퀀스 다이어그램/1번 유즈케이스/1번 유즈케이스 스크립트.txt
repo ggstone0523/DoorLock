@@ -1,21 +1,21 @@
 title 1번 유즈케이스
 
 actor "User" as user
-participant "TouchGFX[Screen1View]" as TouchGFX(Screen1View)
+participant "TouchGFX[Screen1View]" as touchgfx
 participant "numberkey" as numberkey
 participant "sound" as sound
 participant "motor" as motor
 
 alt 시나리오(기본)-1 / 시나리오(대안)-1 / 시나리오(예외상황)-1
 loop 시용자가 누른 숫자키 != * 키
-user->TouchGFX(Screen1View):숫자키를 누른다
-TouchGFX(Screen1View)->numberkey:NumberKeyMessageBuffer[MQ](char)
+user->touchgfx:숫자키를 누른다
+touchgfx->numberkey:NumberKeyMessageBuffer[MQ](char)
 numberkey->sound:SoundEventGroup[Event](SOUND_CLICK_NUMBER_KEY)
 end
 
 
-user->TouchGFX(Screen1View):* 키를 누른다
-TouchGFX(Screen1View)->numberkey:NumberKeyMessageBuffer[MQ](char)
+user->touchgfx:* 키를 누른다
+touchgfx->numberkey:NumberKeyMessageBuffer[MQ](char)
 alt 시나리오(기본)-1 / 시나리오(대안)-1
 numberkey->motor:MotorEventGroup[Event](MOTOR_CONTROL)
 numberkey->sound:SoundEventGroup[Event](SOUND_SUCCESS)
@@ -24,7 +24,7 @@ numberkey->sound:SoundEventGroup[Event](SOUND_FAIL)
 end
 
 else 시나리오(예외상황)-2
-user->TouchGFX(Screen1View):숫자키를 누른다
-TouchGFX(Screen1View)->numberkey:NumberKeyMessageBuffer[MQ](char)
+user->touchgfx:숫자키를 누른다
+touchgfx->numberkey:NumberKeyMessageBuffer[MQ](char)
 numberkey->sound:SoundEventGroup[Event](SOUND_FAIL)
 end

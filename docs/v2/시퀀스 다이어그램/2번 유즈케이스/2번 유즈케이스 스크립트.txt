@@ -1,0 +1,12 @@
+title 2번 유즈케이스
+
+actor "User" as user
+participant "*닫힘 버튼_INTERRUPT" as closebtn
+participant "closedoor" as closedoor
+participant "sound" as sound
+participant "motor" as motor
+
+user->closebtn:닫힘 버튼을 누른다
+closebtn->closedoor:TaskModeEventGroup[Event](TASKMODE_CLOSEDOOR)
+closedoor->motor:MotorEventGroup[Event](MOTOR_CLOSE_STATUS)
+closedoor->sound:SoundEventGroup[Event](SOUND_SUCCESS)
