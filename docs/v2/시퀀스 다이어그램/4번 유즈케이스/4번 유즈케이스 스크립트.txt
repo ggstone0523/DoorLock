@@ -1,0 +1,37 @@
+title 4번 유즈케이스
+
+actor "User" as user
+participant "*비밀번호 초기화 버튼_INTERRUPT" as pwinitbtn
+participant "passwordreset" as pwreset
+participant "TouchGFX[Screen1View]" as touchgfx
+participant "numberkey" as numberkey
+participant "sound" as sound
+
+user->pwinitbtn:비밀번호 초기화 버튼을 누른다
+pwinitbtn->pwreset:TaskModeEventGroup[Event](TASKMODE_PASSWORDRESET)
+pwreset->numberkey:TaskModeEventGroup[Event](TASKMODE_PASSWORDRESETSTART)
+pwreset->sound:SoundEventGroup[Event](SOUND_ONE)
+
+loop (시용자가 누른 숫자키 != (* 키 OR # 키)) AND (사용자가 숫자키를 누른 횟수 <= 8)
+user->touchgfx:숫자키를 누른다
+touchgfx->numberkey:NumberKeyMessageBuffer[MQ](char)
+numberkey->sound:SoundEventGroup[Event](SOUND_CLICK_NUMBER_KEY)
+end
+
+alt 시나리오(기본)-1
+user->touchgfx:# 키를 누른다
+touchgfx->numberkey:NumberKeyMessageBuffer[MQ](char)
+numberkey->sound:SoundEventGroup[Event](SOUND_SUCCESS)
+else 시나리오(예외상황)-1
+user->touchgfx:*와 #을 제외한 숫자키를 누른다
+touchgfx->numberkey:NumberKeyMessageBuffer[MQ](char)
+numberkey->sound:SoundEventGroup[Event](SOUND_FAIL)
+else 시나리오(예외상황)-2
+user->touchgfx:# 키를 누른다
+touchgfx->numberkey:NumberKeyMessageBuffer[MQ](char)
+numberkey->sound:SoundEventGroup[Event](SOUND_FAIL)
+else 시나리오(예외상황)-3
+user->touchgfx:* 키를 누른다
+touchgfx->numberkey:NumberKeyMessageBuffer[MQ](char)
+numberkey->sound:SoundEventGroup[Event](SOUND_FAIL)
+end
