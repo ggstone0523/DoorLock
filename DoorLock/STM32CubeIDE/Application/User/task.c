@@ -12,8 +12,8 @@ EventGroupHandle_t MotorEventGroup;
 EventGroupHandle_t SoundEventGroup;
 EventGroupHandle_t LockEventGroup;
 
-MessageBufferHandle_t NumberKeyMessageBuffer;
-MessageBufferHandle_t MotorStatusMessageBuffer;
+QueueHandle_t NumberKeyMessageQueue;
+QueueHandle_t MotorStatusMessageQueue;
 
 
 extern TIM_HandleTypeDef htim2;
@@ -106,10 +106,7 @@ void NumberKeyTask(void *argument)
 	  else if((uxBits & LOCK_UP) != 0)
 		  isLock = 1;
 
-	  xReceivedBytes = xMessageBufferReceive(NumberKeyMessageBuffer,
-			  (void*)&ucRxData,
-			  sizeof(ucRxData),
-			  xBlockTime);
+	  xReceivedBytes = xQueueReceive(NumberKeyMessageQueue, (void*)&ucRxData, xBlockTime);
 
 	  if(xReceivedBytes <= 0)
 		  continue;
@@ -218,12 +215,13 @@ void MotorTask(void *argument)
   uint8_t isMotorStatusLock = 0; // 0: open, 1: close
   const TickType_t xBlockTime = pdMS_TO_TICKS(200);
   const TickType_t xMotorActivateTime = pdMS_TO_TICKS(20);
+  uint8_t numOfMotorStatusGetEvent = 0;
 
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2); // 2000 열린 상태
   for(;;)
   {	  uxBits = xEventGroupWaitBits(
 		  MotorEventGroup,
-		  MOTOR_CONTROL | MOTOR_OPEN_STATUS | MOTOR_CLOSE_STATUS | MOTOR_GET_STATUS,
+		  MOTOR_CONTROL | MOTOR_OPEN_STATUS | MOTOR_CLOSE_STATUS | MOTOR_STATUS_GET_FOR_PASSWORDRESET | MOTOR_STATUS_GET_FOR_LOOKDOOR,
 		  pdTRUE,
 		  pdFALSE,
 		  xBlockTime);
@@ -248,11 +246,15 @@ void MotorTask(void *argument)
   		  vTaskDelay(xMotorActivateTime);
   		  isMotorStatusLock = 1;
   	  }
-  	  if((uxBits & MOTOR_GET_STATUS) != 0)
+  	  if((uxBits & MOTOR_STATUS_GET_FOR_PASSWORDRESET) != 0)
+  		numOfMotorStatusGetEvent++;
+  	  if((uxBits & MOTOR_STATUS_GET_FOR_LOOKDOOR) != 0)
+  		numOfMotorStatusGetEvent++;
+
+  	  while(numOfMotorStatusGetEvent > 0)
   	  {
-  		xMessageBufferSend(MotorStatusMessageBuffer,
-  				(void*)&isMotorStatusLock,
-  				sizeof(isMotorStatusLock), 0);
+  		numOfMotorStatusGetEvent--;
+  		xQueueSend(MotorStatusMessageQueue, (void*)&isMotorStatusLock, 0);
   	  }
   }
 }
@@ -284,7 +286,9 @@ void CloseDoorTask(void *argument)
 void PasswordResetTask(void *argument)
 {
 	EventBits_t uxBits;
+	uint8_t ucRxData;
 	const TickType_t xBlockTime = pdMS_TO_TICKS(200);
+	const TickType_t xMessageTime = pdMS_TO_TICKS(200);
 	uint32_t baseTick = HAL_GetTick();
 
 	for(;;)
@@ -299,8 +303,15 @@ void PasswordResetTask(void *argument)
 	  	{
 			if(DebounceEvent(&baseTick) == 1)
 				continue;
-	  		xEventGroupSetBits(TaskModeEventGroup, TASKMODE_PASSWORDRESETSTART);
-	  		xEventGroupSetBits(SoundEventGroup, SOUND_ONE);
+  			xEventGroupSetBits(MotorEventGroup, MOTOR_STATUS_GET_FOR_LOOKDOOR);
+  			while(xQueueReceive(MotorStatusMessageQueue,(void*)&ucRxData, xMessageTime) == errQUEUE_EMPTY);
+  			if(ucRxData == 0)
+  			{
+  				xEventGroupSetBits(TaskModeEventGroup, TASKMODE_PASSWORDRESETSTART);
+  				xEventGroupSetBits(SoundEventGroup, SOUND_ONE);
+  			}
+  			else
+  				xEventGroupSetBits(SoundEventGroup, SOUND_FAIL);
 	  	}
 	}
 }
@@ -337,7 +348,6 @@ void LockDoorTask(void *argument)
 	uint8_t ucRxData;
 	const TickType_t xBlockTime = pdMS_TO_TICKS(200);
 	const TickType_t xMessageTime = pdMS_TO_TICKS(200);
-	size_t xReceivedBytes;
 	uint32_t baseTick = HAL_GetTick();
 
 	for(;;)
@@ -360,14 +370,8 @@ void LockDoorTask(void *argument)
 	  		}
 	  		else
 	  		{
-	  			xEventGroupSetBits(MotorEventGroup, MOTOR_GET_STATUS);
-	  			do
-	  			{
-	  			xReceivedBytes = xMessageBufferReceive(MotorStatusMessageBuffer,
-	  								(void*)&ucRxData,
-									sizeof(ucRxData),
-									xMessageTime);
-	  			} while(xReceivedBytes > 0);
+	  			xEventGroupSetBits(MotorEventGroup, MOTOR_STATUS_GET_FOR_LOOKDOOR);
+	  			while(xQueueReceive(MotorStatusMessageQueue,(void*)&ucRxData, xMessageTime) == errQUEUE_EMPTY);
 	  			if(ucRxData == 1)
 	  			{
 	  				xEventGroupSetBits(LockEventGroup, LOCK_UP);

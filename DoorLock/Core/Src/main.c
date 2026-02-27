@@ -150,8 +150,8 @@ extern EventGroupHandle_t MotorEventGroup;
 extern EventGroupHandle_t SoundEventGroup;
 extern EventGroupHandle_t LockEventGroup;
 
-extern MessageBufferHandle_t NumberKeyMessageBuffer;
-extern MessageBufferHandle_t MotorStatusMessageBuffer;
+extern QueueHandle_t NumberKeyMessageQueue;
+extern QueueHandle_t MotorStatusMessageQueue;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -301,8 +301,8 @@ int main(void)
   SoundEventGroup = xEventGroupCreate();
   LockEventGroup = xEventGroupCreate();
 
-  NumberKeyMessageBuffer = xMessageBufferCreate(100);
-  MotorStatusMessageBuffer = xMessageBufferCreate(100);
+  NumberKeyMessageQueue = xQueueCreate(20, sizeof(uint8_t));
+  MotorStatusMessageQueue = xQueueCreate(10, sizeof(uint8_t));
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */

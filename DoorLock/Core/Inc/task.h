@@ -10,7 +10,7 @@
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
-#include "message_buffer.h"
+#include "queue.h"
 
 #define TASKMODE_CLOSEDOOR (1 << 0)
 #define TASKMODE_PASSWORDRESET (1 << 1)
@@ -22,7 +22,8 @@
 #define MOTOR_CONTROL (1 << 0)
 #define MOTOR_OPEN_STATUS (1 << 1)
 #define MOTOR_CLOSE_STATUS (1 << 2)
-#define MOTOR_GET_STATUS (1 << 3)
+#define MOTOR_STATUS_GET_FOR_PASSWORDRESET (1 << 3)
+#define MOTOR_STATUS_GET_FOR_LOOKDOOR (1 << 4)
 
 #define SOUND_CLICK_NUMBER_KEY (1 << 0)
 #define SOUND_SUCCESS (1 << 1)
