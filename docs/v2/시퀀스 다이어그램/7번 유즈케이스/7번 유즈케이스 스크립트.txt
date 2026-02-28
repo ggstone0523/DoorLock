@@ -1,0 +1,12 @@
+title 7번 유즈케이스
+
+actor "User" as user
+participant "*도어락 외부 작동 잠금 버튼_INTERRUPT" as lockbtn
+participant "lockdoor" as lockdoor
+participant "sound" as sound
+participant "numberkey" as numberkey
+
+user->lockbtn:도어락 외부 작동 잠금 버튼을 누른다
+lockbtn->lockdoor:TaskModeEventGroup[Event](TASKMODE_LOCKDOOR)
+lockdoor->numberkey:LockEventGroup[Event](LOCK_DOWN)
+lockdoor->sound:SoundEventGroup[Event](SOUND_SUCCESS)
