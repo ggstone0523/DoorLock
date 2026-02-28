@@ -1,19 +1,16 @@
-title 6번 유즈케이스
+title 5번 유즈케이스
 
 actor "User" as user
-participant "*도어락 외부 작동 잠금 버튼_INTERRUPT" as lockbtn
-participant "lockdoor" as lockdoor
-participant "motor" as motor
+participant "*열림 버튼_INTERRUPT" as openbtn
+participant "opendoor" as opendoor
 participant "sound" as sound
+participant "motor" as motor
+participant "lockdoor" as lockdoor
 participant "numberkey" as numberkey
 
-user->lockbtn:도어락 외부 작동 잠금 버튼을 누른다
-lockbtn->lockdoor:TaskModeEventGroup[Event](TASKMODE_LOCKDOOR)
-lockdoor->motor:MotorEventGroup[Event](MOTOR_STATUS_GET_FOR_LOOKDOOR)
-motor->lockdoor:MotorStatusMessageQueue[MQ](uint8)
-alt 시나리오(기본)-1
-lockdoor->numberkey:LockEventGroup[Event](LOCK_UP)
-lockdoor->sound:SoundEventGroup[Event](SOUND_SUCCESS)
-else 시나리오(예외상황)-1
-lockdoor->sound:SoundEventGroup[Event](SOUND_FAIL)
-end
+user->openbtn:열림 버튼을 누른다
+openbtn->opendoor:TaskModeEventGroup[Event](TASKMODE_OPENDOOR)
+opendoor->motor:MotorEventGroup[Event](MOTOR_OPEN_STATUS)
+opendoor->sound:SoundEventGroup[Event](SOUND_SUCCESS)
+opendoor->lockdoor:TaskModeEventGroup[Event](TASKMODE_LOCKDOOR_DOWN)
+lockdoor->numberkey:LockEventGroup[Event](LOCK_DOWN)
