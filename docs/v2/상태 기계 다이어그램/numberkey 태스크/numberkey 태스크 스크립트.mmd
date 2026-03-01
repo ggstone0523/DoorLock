@@ -1,0 +1,44 @@
+---
+config:
+  layout: elk
+title: numberkey 태스크
+---
+stateDiagram
+  direction TB
+  state IfCheckLock <<choice>>
+  state IfCheckKey <<choice>>
+  state IfCheckNewPWKey <<choice>>
+  state IfValidatePW <<choice>>
+  state IfCheckChangePW <<choice>>
+
+  [*] --> Init:태스크를 시작함
+  Init --> Ready:변수 초기화가 완료됨
+  Ready --> CheckLock:사용자가 숫자키를 누름
+
+  CheckLock --> IfCheckLock
+  IfCheckLock --> Failed:[도어락 외부 작동 잠금이 걸려있음]
+  IfCheckLock --> CheckChangePW:[도어락 외부 작동 잠금이 풀려있음]
+  
+  CheckChangePW --> IfCheckChangePW
+  IfCheckChangePW --> CheckKey:[비밀번호 변경 모드가 아님]
+  IfCheckChangePW --> CheckNewPWKey:[비밀번호 변경 모드임]
+
+  CheckKey --> IfCheckKey
+  IfCheckKey --> SaveKey:[사용자가 누른 숫자키가 * 키가 아님]
+  SaveKey --> Ready:숫자키 저장 완료
+  IfCheckKey --> ValidatePW:[사용자가 누른 숫자키가 * 키]
+  
+  ValidatePW --> IfValidatePW
+  IfValidatePW --> Failed:[잘못된 비밀번호가 입력됨]
+  IfValidatePW --> Success:[올바른 비밀번호가 입력됨]
+
+  CheckNewPWKey --> IfCheckNewPWKey
+  IfCheckNewPWKey --> ValidateNewPW:[사용자가 누른 키가 # 키]
+  IfCheckNewPWKey --> SaveKey:[사용자가 누른키가 # 키, * 키가 아니고 현재까지 입력한 숫자키의 개수가 8개 이하]
+  IfCheckNewPWKey --> Failed:[사용자가 누른키가 * 키 이거나 현재까지 입력한 숫자키의 개수가 9개 이상]
+
+  ValidateNewPW --> Success:[올바른 새로운 비밀번호가 입력됨]
+  ValidateNewPW --> Failed:[잘못된 새로운 비밀번호가 입력됨]
+
+  Failed --> Ready
+  Success --> Ready
