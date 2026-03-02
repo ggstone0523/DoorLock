@@ -1,0 +1,17 @@
+---
+config:
+  layout: elk
+title: 도어락
+---
+stateDiagram
+  direction TB
+  [*] --> OpenDoor:전원 연결
+  OpenDoor --> CloseDoor:닫힘 버튼 누르기 / 키패드에 올바른 비밀번호를 입력한 후 * 키 누르기
+  OpenDoor --> OpenDoor:열림 버튼 누르기
+  OpenDoor --> InitPW:비밀번호 초기화 버튼 누르기
+  CloseDoor --> OpenDoor:열림 버튼 누르기 / 키패드에 올바른 비밀번호를 입력한 후 * 키 누르기
+  CloseDoor --> CloseDoor:닫힘 버튼 누르기
+  CloseDoor --> LockDoor:도어락 외부 작동 잠금 버튼 누르기
+  LockDoor --> CloseDoor:도어락 외부 작동 잠금 버튼 누르기
+  InitPW --> InitPW:* 키 및 # 키를 제외한 숫자키를 8자 이하로 누르기 / 비밀번호 초기화 버튼 누르기
+  InitPW --> OpenDoor:* 키나 # 키를 누르거나 숫자키를 9자 이상 누르기
