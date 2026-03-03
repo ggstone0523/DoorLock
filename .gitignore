@@ -1,52 +1,78 @@
-# Prerequisites
-*.d
-
-# Object files
+# ========================================
+# 임베디드 프로젝트 .gitignore
+# STM32 / Keil / STM32CubeIDE / IAR
+# ========================================
+# ===== 빌드 결과물 =====
 *.o
-*.ko
 *.obj
 *.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
+*.bin
 *.hex
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+*.map
+*.lst
+*.d
+*.i
+*.s
+*.axf
+*.htm
+*.lnp
+*.dep
+*.crf
+*.sct
+# ===== Keil uVision =====
+Objects/
+Listings/
+DebugConfig/
+RTE/
+*.uvoptx
+*.uvguix.*.bak
+*.scvd
+*.dbgconf
+JLinkLog.txt
+JLinkSettings.ini
+# ===== STM32CubeIDE =====
+Debug/
+Release/
+.settings/
+*.launch
+build/
+# ===== IAR Embedded Workbench =====
+Debug/
+Release/
+settings/
+*.dep
+*.ewt
+# ===== VS Code =====
+.vscode/*
+!.vscode/settings.json # 프로젝트 설정은 공유할 수 있음
+!.vscode/tasks.json
+!.vscode/launch.json
+# ===== 시스템 파일 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+# ===== 개인 설정 / 비밀 =====
+*.env
+secrets.h
+config_local.h
+# ===== 문서 빌드 =====
+docs/_build/
+*.pdf
+# ===== 패키지 매니저 =====
+node_modules/
+__pycache__/
+*.pyc
+# ===== FreeRTOS =====
+# FreeRTOS 소스를 서브모듈로 관리하는 경우
+# (서브모듈이 아니라 직접 포함한 경우 이 줄 제거)
+*/Middlewares/Third_Party/FreeRTOS/
+# FreeRTOS 트레이스 로그
+*.psf
+trace_output/
+# ===== middlewares =====
+*/Middlewares/ST/touchgfx
