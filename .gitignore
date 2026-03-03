@@ -35,7 +35,6 @@ Debug/
 Release/
 .settings/
 *.launch
-build/
 # ===== IAR Embedded Workbench =====
 Debug/
 Release/
