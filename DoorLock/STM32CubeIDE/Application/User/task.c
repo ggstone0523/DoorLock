@@ -221,7 +221,7 @@ void MotorTask(void *argument)
   for(;;)
   {	  uxBits = xEventGroupWaitBits(
 		  MotorEventGroup,
-		  MOTOR_CONTROL | MOTOR_OPEN_STATUS | MOTOR_CLOSE_STATUS | MOTOR_STATUS_GET_FOR_PASSWORDRESET | MOTOR_STATUS_GET_FOR_LOOKDOOR,
+		  MOTOR_CONTROL | MOTOR_OPEN_STATUS | MOTOR_CLOSE_STATUS | MOTOR_STATUS_GET_FOR_PASSWORDRESET | MOTOR_STATUS_GET_FOR_LOCKDOOR,
 		  pdTRUE,
 		  pdFALSE,
 		  xBlockTime);
@@ -248,7 +248,7 @@ void MotorTask(void *argument)
   	  }
   	  if((uxBits & MOTOR_STATUS_GET_FOR_PASSWORDRESET) != 0)
   		numOfMotorStatusGetEvent++;
-  	  if((uxBits & MOTOR_STATUS_GET_FOR_LOOKDOOR) != 0)
+  	  if((uxBits & MOTOR_STATUS_GET_FOR_LOCKDOOR) != 0)
   		numOfMotorStatusGetEvent++;
 
   	  while(numOfMotorStatusGetEvent > 0)
@@ -303,7 +303,7 @@ void PasswordResetTask(void *argument)
 	  	{
 			if(DebounceEvent(&baseTick) == 1)
 				continue;
-  			xEventGroupSetBits(MotorEventGroup, MOTOR_STATUS_GET_FOR_LOOKDOOR);
+  			xEventGroupSetBits(MotorEventGroup, MOTOR_STATUS_GET_FOR_PASSWORDRESET);
   			while(xQueueReceive(MotorStatusMessageQueue,(void*)&ucRxData, xMessageTime) == errQUEUE_EMPTY);
   			if(ucRxData == 0)
   			{
@@ -370,7 +370,7 @@ void LockDoorTask(void *argument)
 	  		}
 	  		else
 	  		{
-	  			xEventGroupSetBits(MotorEventGroup, MOTOR_STATUS_GET_FOR_LOOKDOOR);
+	  			xEventGroupSetBits(MotorEventGroup, MOTOR_STATUS_GET_FOR_LOCKDOOR);
 	  			while(xQueueReceive(MotorStatusMessageQueue,(void*)&ucRxData, xMessageTime) == errQUEUE_EMPTY);
 	  			if(ucRxData == 1)
 	  			{

@@ -9,7 +9,7 @@ participant "numberkey" as numberkey
 
 user->lockbtn:도어락 외부 작동 잠금 버튼을 누른다
 lockbtn->lockdoor:TaskModeEventGroup[Event](TASKMODE_LOCKDOOR)
-lockdoor->motor:MotorEventGroup[Event](MOTOR_STATUS_GET_FOR_LOOKDOOR)
+lockdoor->motor:MotorEventGroup[Event](MOTOR_STATUS_GET_FOR_LOCKDOOR)
 motor->lockdoor:MotorStatusMessageQueue[MQ](uint8)
 alt 시나리오(기본)-1
 lockdoor->numberkey:LockEventGroup[Event](LOCK_UP)
